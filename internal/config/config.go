@@ -9,6 +9,7 @@ import (
 
 type Config struct {
 	ENV        string `yaml:"env" env-default:"local"`
+	StorageCnf string `yaml:"storage_config"`
 	HTTPServer `yaml:"http_server"`
 }
 
@@ -34,4 +35,9 @@ func MustLoad() Config {
 		log.Fatalf("can not read config %s", err)
 	}
 	return cnf
+}
+func MustSetEnv() {
+	if err := os.Setenv("CONFIG_PATH", ".\\config\\local.yaml"); err != nil {
+		log.Fatalf("can not set env %s", err)
+	}
 }
