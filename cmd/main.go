@@ -1,16 +1,26 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"log"
-	"os"
 	"url-sorter/internal/config"
+	"url-sorter/internal/logger"
+	"url-sorter/internal/storage"
+	"url-sorter/internal/storage/database"
 )
 
 func main() {
-	if err := os.Setenv("CONFIG_PATH", ".\\config\\local.yaml"); err != nil {
-		log.Fatalf("can not set env %s", err)
-	}
+	config.MustSetEnv()
 	cnf := config.MustLoad()
-	fmt.Println(cnf)
+	log := logger.SetupLogger(cnf.ENV)
+	log.Info("starting url shorter", cnf.ENV)
+	stg, err := storage.New(cnf.StorageCnf)
+	if err != nil {
+		log.Debug(err.Error())
+	}
+	url, err := stg.UseCase.SaveURL(context.Background(), &database.SaveURLParams{Url: "123", Alias: "1", ID: 1})
+	if err != nil {
+		log.Debug(err.Error())
+	}
+	fmt.Println(url, stg)
 }
