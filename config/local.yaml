@@ -1,5 +1,5 @@
-env: "dev"
-storage_config: "postgres://postgres:postgres@localhost:5444/postgres?sslmode=disable"
+env: "local"
+storage_config: "postgres://postgres:postgres@localhost:5444/url-shorter?sslmode=disable"
 http_server:
   address: "localhost:8020"
   timeout: 4s

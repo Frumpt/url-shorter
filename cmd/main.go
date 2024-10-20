@@ -1,12 +1,12 @@
 package main
 
 import (
-	"context"
-	"fmt"
+	"net/http"
+	"url-sorter/internal/api/handlers/url/save"
 	"url-sorter/internal/config"
 	"url-sorter/internal/logger"
+	"url-sorter/internal/router"
 	"url-sorter/internal/storage"
-	"url-sorter/internal/storage/database"
 )
 
 func main() {
@@ -18,9 +18,19 @@ func main() {
 	if err != nil {
 		log.Debug(err.Error())
 	}
-	url, err := stg.UseCase.SaveURL(context.Background(), &database.SaveURLParams{Url: "123", Alias: "1", ID: 1})
-	if err != nil {
-		log.Debug(err.Error())
+	rt := router.NewRouter(log)
+	rt.Post("/url", save.New(log, stg))
+
+	srv := &http.Server{
+		Addr:         cnf.Address,
+		Handler:      rt,
+		ReadTimeout:  cnf.HTTPServer.Timeout,
+		WriteTimeout: cnf.HTTPServer.Timeout,
+		IdleTimeout:  cnf.HTTPServer.IdleTimeout,
 	}
-	fmt.Println(url, stg)
+	if err := srv.ListenAndServe(); err != nil {
+		log.Error("failed to start server")
+	}
+
+	log.Error("server stopped")
 }

@@ -8,7 +8,7 @@ import (
 )
 
 type Storage struct {
-	UseCase *database.Queries
+	*database.Queries
 }
 
 func New(cnfStorage string) (*Storage, error) {
@@ -18,6 +18,6 @@ func New(cnfStorage string) (*Storage, error) {
 		return nil, fmt.Errorf("failed pgx connection: %w", err)
 	}
 	return &Storage{
-		UseCase: database.New(db),
+		database.New(db),
 	}, nil
 }
