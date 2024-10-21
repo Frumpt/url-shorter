@@ -4,6 +4,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"log/slog"
+	del "url-sorter/internal/api/handlers/url/delete"
 	"url-sorter/internal/api/handlers/url/redirect"
 	"url-sorter/internal/api/handlers/url/save"
 	"url-sorter/internal/logger"
@@ -24,6 +25,7 @@ func NewRouter(log *slog.Logger, stg *storage.Storage) *chi.Mux {
 
 	router.Post("/url", save.New(log, stg))
 	router.Get("/{alias}", redirect.New(log, stg))
+	router.Delete("/{alias}", del.New(log, stg))
 
 	return router
 }
