@@ -2,14 +2,13 @@ package save
 
 import (
 	"context"
-	"encoding/json"
-	"errors"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 	"github.com/go-playground/validator/v10"
 	"log/slog"
 	"net/http"
 	"url-sorter/internal/api/response"
+	"url-sorter/internal/logger"
 	"url-sorter/internal/storage/database"
 	"url-sorter/lib/random"
 )
@@ -33,10 +32,6 @@ type URLSaver interface {
 	SaveURL(ctx context.Context, arg *database.SaveURLParams) (*database.Url, error)
 }
 
-func ErrAttr(err error) slog.Attr {
-	return slog.Any("error", err)
-}
-
 func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "internal.api.save.New"
@@ -51,7 +46,7 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 		err := render.DecodeJSON(r.Body, &req)
 		if err != nil {
 			//TODO: remake error to pretty in add func
-			log.Error("failed to decode request", ErrAttr(err))
+			log.Error("failed to decode request", logger.ErrAttr(err))
 
 			render.JSON(w, r, response.Error("failed to decode request"))
 
@@ -69,10 +64,8 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 				render.JSON(w, r, response.Error("wrong type validator error"))
 				return
 			}
-			//TODO: remake error to pretty in add func
 			validError := response.ValidationError(validErrors)
-			validErrorJSON, _ := json.Marshal(validError)
-			log.Error("invalid request", ErrAttr(errors.New(string(validErrorJSON))))
+			log.Error("invalid request", logger.ErrAttr(validError))
 
 			render.JSON(w, r, validError)
 			return
@@ -86,7 +79,7 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 		res, err := urlSaver.SaveURL(context.Background(), (*database.SaveURLParams)(&req))
 		if err != nil {
 			//TODO: remake error to pretty in add func
-			log.Error("error save url", ErrAttr(err))
+			log.Error("error save url", logger.ErrAttr(err))
 			render.JSON(w, r, response.Error(err.Error()))
 			return
 		}

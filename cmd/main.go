@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"url-sorter/internal/api/handlers/url/save"
 	"url-sorter/internal/config"
 	"url-sorter/internal/logger"
 	"url-sorter/internal/router"
@@ -18,8 +17,8 @@ func main() {
 	if err != nil {
 		log.Debug(err.Error())
 	}
-	rt := router.NewRouter(log)
-	rt.Post("/url", save.New(log, stg))
+
+	rt := router.NewRouter(log, stg)
 
 	srv := &http.Server{
 		Addr:         cnf.Address,
