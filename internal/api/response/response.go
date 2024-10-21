@@ -12,8 +12,9 @@ type Response struct {
 }
 
 const (
-	StatusOk    = "OK"
-	StatusError = "ERROR"
+	StatusOk      = "OK"
+	StatusError   = "ERROR"
+	ValidateError = "validation error:"
 )
 
 func OK() Response {
@@ -34,11 +35,11 @@ func ValidationError(errs validator.ValidationErrors) Response {
 	for _, err := range errs {
 		switch err.ActualTag() {
 		case "required":
-			errMsgs = append(errMsgs, fmt.Sprintf("faild %s is a requared fiald", err.Field()))
+			errMsgs = append(errMsgs, fmt.Sprintf("%s failed %s is a required field", ValidateError, err.Field()))
 		case "url":
-			errMsgs = append(errMsgs, fmt.Sprintf("faild %s is a value URL", err.Field()))
+			errMsgs = append(errMsgs, fmt.Sprintf("%s failed %s is a value URL", ValidateError, err.Field()))
 		default:
-			errMsgs = append(errMsgs, fmt.Sprintf("faild %s is not valid", err.Field()))
+			errMsgs = append(errMsgs, fmt.Sprintf("%s failed %s is not valid", ValidateError, err.Field()))
 		}
 	}
 
